@@ -1,0 +1,98 @@
+#Repl(normal jupyter)
+\ + rt :Open Repl
+\ + rc :Send block code to repl (separate with #%%)
+\ + rc :normal:Send current line
+		visual:Send current selected
+@ + # :fast create block
+
+#Undo
+u : undo
+
+#Find text in all project
+:+ Ag + your_pattern
+
+#Change all occurence
+: + %s/old_word/new_word 
+
+#Move between split screen
+Ctr + w + h/j/k/l : move left,down,up,right
+
+#Comment
+gcc : comment current line
+gc : Visual Mode : comment selected text
+	 Commented text : uncomment that text
+
+
+#Recommendation
+Ctr + n : select the first on recommend list
+Ctr + p : select the last on recommend list
+
+#Indent
+start visual mode
+select the text you want to indent/unindent
+> : indent one more tab
+< : unindent one more tab:
+
+#Terminal
+<F7> : Run curren Python,Bash file
+<F8> : Open terminal
+<F9> : Close current terminal
+
+#Buffer/NerdTree
+<F1> : Refresh NerdTree
+<F2> : move to next buffer
+<F3> : move to previous buffer
+<F4> : Close the current buffer
+<F5> : Open NerdTree
+<F6> : Move from buffer to NerdTree
+
+#File save/quit
+: + w : save the file
+: + w + q : save and quite
+: + q + ! : quit but not save
+
+#Convert mode (i for Insert Mode,v for Visual Mode,escape for return to Normal Mode,: for command mode)
+	+Insert Mode for input text
+	+Visual Mode for select text
+	+Command Mode for input nvim command
+	+Normal Mode do nothing
+
+#Navigation
+g + g : Move to the head of current file
+Shift + g : Move to the end of current file
+: + line_number : Move to the 
+w : Move to the next word
+b : Move to the back word
+0 : Move to the head of current line
+$ : Move the the end of current line
+
+#Visual Mode
+v : for start Visual Mode
+Shift + v : for start Visual Mode and select the whole current line
+v + i + w : for start Visual Mode and select the whole current word
+g + g + V + G :for start Visual Mode and select the whole text file
+y : copy the selected text
+p : paste to the line under the cursor
+Shift + p : paste to the line above the cursor
+d : cut the selected text for paste
+
+#Insert Mode
+i : for start Insert Mode
+Shift + a : for Insert Mode at the end of current line
+o : for create new line below and to Insert Mode at that line
+Shift + o : for create new line above and to Insert Mode at that line
+
+
+#Finding
+Mode Command /<Words you want to search>
+* : Find all words match the word that the cursor lie in and move the cursor to the first match
+	+ n : move to the next match
+	+ Shift + n : move to the back match
+: + % + s + /old_word/new_word : Change all occurence
+
+#File open,close
+: + e + file_name : open the file
+: + b + d : quit the current open file 
+: + v + s + file_name : open file and split the current window
+	Ctr + w + h/j/k/l : change cursor to the another open split file
+	Ctr + w + H/J/K/L : change place of the openning split file 
