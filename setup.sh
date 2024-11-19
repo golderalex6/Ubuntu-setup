@@ -106,11 +106,17 @@ then
 	mkdir /py_virtual
 	`python3 -m venv /py_virtual`
 fi
-source /py_virtual/bin/activate
 
+#install python libraries
+source /py_virtual/bin/activate
+pip install -r requirements.txt
+mv .pylintrc /home/$current_user/
+
+#Setup for neovim
 if [ ! -d /home/$current_user/.config/nvim ]
 then
 	mv nvim /home/$current_user/.config/nvim
 fi
 
+nvim --headless +"PlugInstall" +qa
 
