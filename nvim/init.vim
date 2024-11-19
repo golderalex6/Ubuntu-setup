@@ -64,6 +64,9 @@ Plug 'tpope/vim-surround'
 
 "Close html tags
 Plug 'alvan/vim-closetag'
+
+"Markdown preview
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 call plug#end()
 
 colorscheme catppuccin " catppuccin-latte, catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha
@@ -130,3 +133,9 @@ let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.md,*py'
 "snippet for auto create notebook block
 iabbrev @# #%%<CR><CR>#%%<ESC>k
 
+"markdown preview
+" set to 1, nvim will open the preview window after entering the Markdown buffer
+let g:mkdp_auto_start = 1
+" set to 1, the nvim will auto close current preview window when changing
+" from Markdown buffer to another buffer
+let g:mkdp_auto_close = 1

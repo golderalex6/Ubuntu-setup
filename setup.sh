@@ -7,16 +7,6 @@ then
 	exit
 fi
 
-#require current_username
-echo 'Enter your username:'
-read current_user
-
-if [ ! -d /home/$current_user/ ]
-then
-	echo 'Your username does not exist ! you need to rerun the file.'
-	exit
-fi
-
 #require in the same dir as the scripts
 current_working_dir=`pwd`
 __file__=`realpath $BASH_SOURCE`
@@ -27,6 +17,16 @@ echo "current working dir :" $current_working_dir
 if [[ $current_working_dir != $file_dir ]]
 then
 	echo "You are not in the same folder of the file . Please go back !"
+	exit
+fi
+
+#require current_username
+echo 'Enter your username:'
+read current_user
+
+if [ ! -d /home/$current_user/ ]
+then
+	echo 'Your username does not exist ! you need to rerun the file.'
 	exit
 fi
 
@@ -56,12 +56,12 @@ then
 	rm google-chrome-stable_current_amd64.deb
 
 	#grub-customizer 
-	add-apt-repository ppa:danielrichter2007/grub-customizer
+	add-apt-repository ppa:danielrichter2007/grub-customizer -y
 	apt update
 	apt install grub-customizer -y
 
 	#install vietnamese telex
-	add-apt-repository ppa:bamboo-engine/ibus-bamboo
+	add-apt-repository ppa:bamboo-engine/ibus-bamboo -y
 	apt-get update
 	apt-get install ibus ibus-bamboo --install-recommends -y
 	ibus restart
