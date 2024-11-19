@@ -17,6 +17,20 @@ then
 	exit
 fi
 
+#require in the same dir as the scripts
+current_working_dir=`pwd`
+__file__=`realpath $BASH_SOURCE`
+file_dir=`dirname $__file__`
+
+echo "file dir :" $file_dir 
+echo "current working dir :" $current_working_dir 
+if [[ $current_working_dir != $file_dir ]]
+then
+	echo "You are not in the same folder of the file . Please go back !"
+	exit
+fi
+
+
 #install some useful packages
 apt install sqlite3 -y
 apt install tree -y
@@ -93,3 +107,10 @@ then
 	`python3 -m venv /py_virtual`
 fi
 source /py_virtual/bin/activate
+
+if [ ! -d /home/$current_user/.config/nvim ]
+then
+	mv nvim /home/$current_user/.config/nvim
+fi
+
+
