@@ -29,7 +29,7 @@ apt install apache2 -y
 apt install openssh-server -y
 apt install screen -y
 apt install git -y
-apt install silversearcher-ag
+apt install silversearcher-ag -y
 
 #check if using gui or not to install packges that support gui
 if [[ ! -z `type Xorg` ]]
@@ -44,7 +44,7 @@ then
 	#grub-customizer 
 	add-apt-repository ppa:danielrichter2007/grub-customizer
 	apt update
-	apt install grub-customizer
+	apt install grub-customizer -y
 
 	#install vietnamese telex
 	add-apt-repository ppa:bamboo-engine/ibus-bamboo
@@ -58,12 +58,13 @@ then
 
 
 	#setup nerdfont for nvim-display
-	wget https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Agave/AgaveNerdFont-Regular.ttf
+	curl -L -o AgaveNerdFont-Regular.ttf https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/Agave/AgaveNerdFontMono-Regular.ttf
 	chown $current_user:$current_user AgaveNerdFont-Regular.ttf
 	if [  ! -d /home/$current_user/.local/share/fonts ]
 	then
 		mkdir /home/$current_user/.local/share/fonts
 	fi
+	chown $current_user:$current_user /home/$current_user/.local/share/fonts
 
 	mv AgaveNerdFont-Regular.ttf /home/$current_user/.local/share/fonts
 	fc-cache -f -v
@@ -74,7 +75,6 @@ fi
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 
-
 #add auto use python virtual environment on startup
 echo 'alias py_virtual="source /py_virtual/bin/activate"'>>/etc/bash.bashrc
 echo "if [[ \$(whoami) =~ 'root' ]]">>/etc/bash.bashrc
@@ -82,14 +82,9 @@ echo "then">>/etc/bash.bashrc
 echo "    source /py_virtual/bin/activate">>/etc/bash.bashrc 
 echo "fi">>/etc/bash.bashrc 
 
+echo "source /py_virtual/bin/activate">>/home/$current_user/.bashrc
 
 nvim=`realpath nvim`
-if [ -d /home/$current_user/ ]
-then
-	echo "source /py_virtual/bin/activate">>/home/$current_user/.bashrc
-else
-	echo 'Your username does not exist ! you need to rerun the file.'
-fi
 
 #create folder and python virtual environment
 if [ ! -d /py_virtual ]
