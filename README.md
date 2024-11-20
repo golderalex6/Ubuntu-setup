@@ -15,7 +15,7 @@
 <h2 id="installation">📁<ins>Installation</ins></h2>
 <ul>
     <li>Step 1: Clone the repo.
-    <pre><code>git clone https://github.com/your-username/your-project-name.git</code></pre>
+    <pre><code>git clone https://github.com/golderalex6/Ubuntu-setup.git</code></pre>
     </li>
 </ul>
 
