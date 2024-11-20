@@ -12,24 +12,16 @@ current_working_dir=`pwd`
 __file__=`realpath $BASH_SOURCE`
 file_dir=`dirname $__file__`
 
-echo "file dir :" $file_dir 
-echo "current working dir :" $current_working_dir 
 if [[ $current_working_dir != $file_dir ]]
 then
+	echo "file dir :" $file_dir 
+	echo "current working dir :" $current_working_dir 
 	echo "You are not in the same folder of the file . Please go back !"
 	exit
 fi
 
-#require current_username
-echo 'Enter your username:'
-read current_user
-
-if [ ! -d /home/$current_user/ ]
-then
-	echo 'Your username does not exist ! you need to rerun the file.'
-	exit
-fi
-
+#get current user
+current_user=`who | awk '{print $1}' | head -n 1`
 
 #install some useful packages
 apt install sqlite3 -y
@@ -70,7 +62,7 @@ then
 
 	chown root:root grub
 	mv grub /etc/default
-
+	update-grub
 
 	#install vietnamese telex
 	add-apt-repository ppa:bamboo-engine/ibus-bamboo -y
@@ -97,8 +89,9 @@ then
 fi
 
 #install vim-plug
-sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+sh -c 'curl -fLo "${XDG_DATA_HOME:-/home/'$current_user'/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+chown -R $current_user:$current_user /home/$current_user/.local/share/nvim
 
 #add auto use python virtual environment on startup
 echo 'alias py_virtual="source /py_virtual/bin/activate"'>>/etc/bash.bashrc
@@ -129,5 +122,7 @@ then
 	mv nvim /home/$current_user/.config/nvim
 fi
 
-nvim --headless +"PlugInstall" +qa
+#Install neovim plugins for current_user
+su -c 'nvim --headless +"PlugInstall" +qa' $current_user
 
+reboot
