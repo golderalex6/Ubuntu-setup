@@ -60,6 +60,18 @@ then
 	apt update
 	apt install grub-customizer -y
 
+	#Custom grub
+	chown -R root:root ubuntu
+	if [[ ! -d /boot/grub/themes ]]
+	then
+		mkdir /boot/grub/themes
+	fi
+	mv ubuntu /boot/grub/themes
+
+	chown root:root grub
+	mv grub /etc/default
+
+
 	#install vietnamese telex
 	add-apt-repository ppa:bamboo-engine/ibus-bamboo -y
 	apt-get update
@@ -72,7 +84,6 @@ then
 
 
 	#setup nerdfont for nvim-display
-	curl -L -o AgaveNerdFont-Regular.ttf https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/Agave/AgaveNerdFontMono-Regular.ttf
 	chown $current_user:$current_user AgaveNerdFont-Regular.ttf
 	if [  ! -d /home/$current_user/.local/share/fonts ]
 	then
