@@ -20,14 +20,10 @@
 </ul>
 
 <h2 id="usage">📈<ins>Usage</ins></h2>
-<ul>
-<li>
 <pre><code>sudo su
 bash setup.sh
 </code></pre>
-</li>
 
-</ul>
 
 <h2 id="config">⚙️  <ins>Config</ins></h2>
 <ol>
@@ -61,8 +57,7 @@ fi</code></pre>
 
 <li>
     <p><b>Install useful packages : </b>Installs a list of essential utilities and development tools such as sqlite3, neovim, git, and openssh-server</p>
-<pre><code>
-apt install sqlite3 -y
+<pre><code>apt install sqlite3 -y
 apt install tree -y
 apt install keychain -y
 apt install wget -y
@@ -79,8 +74,7 @@ apt install silversearcher-ag -y
 
 <li>
     <p><b>Check for GUI environment : </b>Checks if the system is running a graphical environment (Xorg). If detected, additional GUI-related software is installed.</p>
-<pre><code>
-if [[ ! -z `type Xorg` ]]
+<pre><code>if [[ ! -z `type Xorg` ]]
 then
     # GUI-specific installations here
 fi
@@ -108,8 +102,7 @@ apt install grub-customizer -y
         </li>
         <li>
         <p><b>Custom grub : </b>Customizes grub by ensuring proper ownership, setting up a custom theme in /boot/grub/themes, and replacing the default grub configuration file in /etc/default with a custom one.</p>
-<pre><code>
-chown -R root:root ubuntu
+<pre><code>chown -R root:root ubuntu
 if [[ ! -d /boot/grub/themes ]]
 then
     mkdir /boot/grub/themes
@@ -129,8 +122,7 @@ ibus restart</code></pre>
     </li>
         <li>
         <p><b>Set up NerdFont for neovim : </b>Sets up a Nerd Font for Neovim by placing it in the user’s fonts directory, ensuring ownership, and updating the font cache.</p>
-<pre><code>
-chown $current_user:$current_user AgaveNerdFont-Regular.ttf
+<pre><code>chown $current_user:$current_user AgaveNerdFont-Regular.ttf
 if [  ! -d /home/$current_user/.local/share/fonts ]
 then
     mkdir /home/$current_user/.local/share/fonts
