@@ -16,15 +16,11 @@ Plug 'vim-airline/vim-airline-themes'
 "Terminal
 Plug 'voldikss/vim-floaterm'
 
-"Python Autocomplete
-if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
-endif
-Plug 'deoplete-plugins/deoplete-jedi'
+Plug 'neovim/nvim-lspconfig'  " Language Server Protocol
+Plug 'hrsh7th/nvim-cmp'       " Completion engine
+Plug 'hrsh7th/cmp-nvim-lsp'   " LSP completion source
+Plug 'saadparwaiz1/cmp_luasnip' " Snippets
+Plug 'L3MON4D3/LuaSnip'       " Snippets engine
 
 
 Plug 'Townk/vim-autoclose' " Automatically close parenthesis, etc
@@ -70,12 +66,14 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': 
 call plug#end()
 
 colorscheme catppuccin " catppuccin-latte, catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha
+
 set number
 set smartindent
 set tabstop=4
 set shiftwidth=4
 set shiftround
 set virtualedit+=onemore
+
 
 nnoremap <silent> <F2> :bprevious <CR>	"Move to next buffer
 nnoremap <silent> <F3> :bnext <CR>	"Move to previous buffer
@@ -105,9 +103,6 @@ let g:floaterm_keymap_kill   = '<F9>'	"Close current terminal
 "Vim-airline
 let g:airline#extensions#tabline#enabled = 1
 let g:python3_host_prog='/py_virtual/bin/python3'
-"Deoplete Vim 
-let g:deoplete#enable_at_startup = 1
-call deoplete#custom#option("max_list",10)
 
 "Neomake
 call neomake#configure#automake('nrw', 50)
@@ -131,7 +126,7 @@ autocmd FileType html,markdown,python set omnifunc=htmlcomplete#CompleteTags
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.md,*py'
 
 "snippet for auto create notebook block
-iabbrev @# #%%<CR><CR>#%%<ESC>k
+iabbrev @# #%%<CR><CR>#%%<ESC>
 
 "markdown preview
 " set to 1, nvim will open the preview window after entering the Markdown buffer
@@ -139,3 +134,44 @@ let g:mkdp_auto_start = 1
 " set to 1, the nvim will auto close current preview window when changing
 " from Markdown buffer to another buffer
 let g:mkdp_auto_close = 1
+
+
+" Configure LSP and Autocompletion
+lua << EOF
+  local lspconfig = require('lspconfig')
+  local cmp = require('cmp')
+
+  -- Enable pyright for Python
+  lspconfig.pyright.setup{}
+
+  -- Autocompletion setup
+  cmp.setup({
+    snippet = {
+      expand = function(args)
+        require('luasnip').lsp_expand(args.body)
+      end,
+    },
+    mapping = {
+      ['<Tab>'] = cmp.mapping.select_next_item(),
+      ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    },
+    sources = {
+      { name = 'nvim_lsp' },
+      { name = 'luasnip' },
+    },
+  })
+EOF
+
+" catppuccin trasnparent
+lua << EOF
+require('catppuccin').setup({
+    transparent_background = true, -- Enable transparency
+    integrations = {
+        treesitter = true, -- Enable Treesitter integration
+        lsp_trouble = true, -- Enable LSP Trouble integration
+    },
+})
+vim.cmd.colorscheme 'catppuccin'
+EOF
+

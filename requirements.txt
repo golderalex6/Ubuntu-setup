@@ -1,14 +1,15 @@
 pandas
 numpy
 matplotlib
+pyqt6
 scipy
 django
 
-tensorflow
 mediapipe
 opencv-python
 scikit-learn
 
 pynvim
-jedi
 pylint
+autopep8
+pyright

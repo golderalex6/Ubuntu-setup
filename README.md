@@ -164,6 +164,20 @@ pip install -r requirements.txt
 </code></pre>
     </li>
 <li>
+    <p><b>TensorFlow Installation Based on GPU Detection : </b>Checks for an NVIDIA GPU using the lspci command. If found, it installs TensorFlow with GPU support; otherwise, it installs the CPU-only version.</p>
+<pre><code>echo -en "\a"
+if [[ `lspci | grep VGA | grep NVIDIA` != '' ]]
+then
+	echo 'You have NVIDIA GPU,install tensorflow for GPU'
+	sleep 5
+	pip install tensorflow[and-cuda] #intstall tensorflow for gpu
+else
+	echo "You don't have NVIDIA GPU,install tensorflow for CPU"
+	sleep 5
+	pip install tensorflow #install tensorflow for cpu
+fi</code></pre>
+    </li>
+<li>
     <p><b>Move .pylint configuration : </b>Moves the .pylintrc file (Python linter configuration) to the user's home directory.</p>
 <pre><code>mv .pylintrc /home/$current_user/</code></pre>
 </li>

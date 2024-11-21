@@ -36,10 +36,14 @@ apt install openssh-server -y
 apt install screen -y
 apt install git -y
 apt install silversearcher-ag -y
+apt install libxcb-cursor-dev -y #for matplotlib
 
 #check if using gui or not to install packges that support gui
 if [[ ! -z `type Xorg` ]]
 then
+	#install xfce4
+	apt install xfce4-terminal -y
+	update-alternatives --set x-terminal-emulator /usr/bin/xfce4-terminal.wrapper #Set xfce4 as default terminal
 
 	apt install okular -y
 	apt install vlc -y
@@ -116,6 +120,19 @@ source /py_virtual/bin/activate
 pip install -r requirements.txt
 mv .pylintrc /home/$current_user/
 
+#Check if have NVDIA GPU
+echo -en "\a"
+if [[ `lspci | grep VGA | grep NVIDIA` != '' ]]
+then
+	echo 'You have NVIDIA GPU,install tensorflow for GPU'
+	sleep 5
+	pip install tensorflow[and-cuda] #intstall tensorflow for gpu
+else
+	echo "You don't have NVIDIA GPU,install tensorflow for CPU"
+	sleep 5
+	pip install tensorflow #install tensorflow for cpu
+fi
+
 #Setup for neovim
 if [ ! -d /home/$current_user/.config/nvim ]
 then
@@ -124,5 +141,14 @@ fi
 
 #Install neovim plugins for current_user
 su -c 'nvim --headless +"PlugInstall" +qa' $current_user
+
+#Setup image background
+if [[ -d /home/$current_user/Downloads/wallpaper ]]
+then
+	mkdir /home/$current_user/Downloads/wallpaper
+fi
+chown -R $current_user:$current_user /home/$current_user/Downloads/wallpaper
+mv sad_cat.png /home/$current_user/Downloads/wallpaper
+gsettings set org.gnome.desktop.background picture-uri "file:///home/$current_user/Downloads/wallpaper/sad_cat.png"
 
 reboot
