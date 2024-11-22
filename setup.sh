@@ -154,7 +154,7 @@ then
 	mkdir /home/$current_user/Downloads/wallpaper
 fi
 chown -R $current_user:$current_user /home/$current_user/Downloads/wallpaper
-mv sad_cat.png /home/$current_user/Downloads/wallpaper
+mv sad_cat.jpg /home/$current_user/Downloads/wallpaper
 gsettings set org.gnome.desktop.background picture-uri "file:///home/$current_user/Downloads/wallpaper/sad_cat.jpg"
 
 #Setup xfce4-terminal background
@@ -173,9 +173,9 @@ echo '''<?xml version="1.0" encoding="UTF-8"?>
   <property name="background-image-style" type="string" value="TERMINAL_BACKGROUND_STYLE_FILLED"/>
 </channel>
 ''' >>xfce4-terminal.xml
-chown $current_user xfce4-terminal.xml
+chown $current_user:$current_user xfce4-terminal.xml
 
-mv xfce4-terminal.xml home/$current_user/.config/xfce4/xfconf/xfce-perchannel-xml
+mv xfce4-terminal.xml /home/$current_user/.config/xfce4/xfconf/xfce-perchannel-xml
 
 apt update && apt upgrade -y
 reboot
