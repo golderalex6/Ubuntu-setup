@@ -30,6 +30,9 @@ apt install keychain -y
 apt install wget -y
 apt install curl -y
 apt install neovim -y
+
+apt update && apt upgrade -y #check package update to prevent conflict
+
 apt install python3-venv -y
 apt install apache2 -y
 apt install openssh-server -y
@@ -45,6 +48,7 @@ then
 	apt install xfce4-terminal -y
 	update-alternatives --set x-terminal-emulator /usr/bin/xfce4-terminal.wrapper #Set xfce4 as default terminal
 
+	#install media
 	apt install okular -y
 	apt install vlc -y
 	wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -98,11 +102,13 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-/home/'$current_user'/.local/share}"/nvim/sit
 chown -R $current_user:$current_user /home/$current_user/.local/share/nvim
 
 #add auto use python virtual environment on startup
-echo 'alias py_virtual="source /py_virtual/bin/activate"'>>/etc/bash.bashrc
-echo "if [[ \$(whoami) =~ 'root' ]]">>/etc/bash.bashrc
-echo "then">>/etc/bash.bashrc 
-echo "    source /py_virtual/bin/activate">>/etc/bash.bashrc 
-echo "fi">>/etc/bash.bashrc 
+echo '''
+alias py_virtual="source /py_virtual/bin/activate"
+if [[ $(whoami) =~ "root" ]]
+then
+    source /py_virtual/bin/activate
+fi
+''' >>/etc/bash.bashrc 
 
 echo "source /py_virtual/bin/activate">>/home/$current_user/.bashrc
 
@@ -143,12 +149,33 @@ fi
 su -c 'nvim --headless +"PlugInstall" +qa' $current_user
 
 #Setup image background
-if [[ -d /home/$current_user/Downloads/wallpaper ]]
+if [[  ! -d /home/$current_user/Downloads/wallpaper ]]
 then
 	mkdir /home/$current_user/Downloads/wallpaper
 fi
 chown -R $current_user:$current_user /home/$current_user/Downloads/wallpaper
 mv sad_cat.png /home/$current_user/Downloads/wallpaper
-gsettings set org.gnome.desktop.background picture-uri "file:///home/$current_user/Downloads/wallpaper/sad_cat.png"
+gsettings set org.gnome.desktop.background picture-uri "file:///home/$current_user/Downloads/wallpaper/sad_cat.jpg"
 
+#Setup xfce4-terminal background
+mv fire_cat.jpg /home/$current_user/Downloads/wallpaper #setup wallpaper for terminal
+
+touch xfce4-terminal.xml
+
+echo '''<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-terminal" version="1.0">
+  <property name="background-mode" type="string" value="TERMINAL_BACKGROUND_IMAGE"/>
+  <property name="background-image-shading" type="double" value="0.5"/>
+  <property name="font-name" type="string" value="Agave Nerd Font Mono 12"/>
+  <property name="shortcuts-no-menukey" type="bool" value="false"/>
+  <property name="background-image-file" type="string" value="/home/'''$current_user'''/Downloads/wallpaper/fire_cat.jpg"/>
+  <property name="background-image-style" type="string" value="TERMINAL_BACKGROUND_STYLE_FILLED"/>
+</channel>
+''' >>xfce4-terminal.xml
+chown $current_user xfce4-terminal.xml
+
+mv xfce4-terminal.xml home/$current_user/.config/xfce4/xfconf/xfce-perchannel-xml
+
+apt update && apt upgrade -y
 reboot
