@@ -89,6 +89,36 @@ then
 	mv AgaveNerdFontMono-Regular.ttf /home/$USER/.local/share/fonts
 	fc-cache -f -v
 
+	
+	#Setup screen background
+	if [[  ! -d /home/$USER/Downloads/wallpaper ]]
+	then
+		mkdir /home/$USER/Downloads/wallpaper
+	fi
+	mv screen_background.jpg /home/$USER/Downloads/wallpaper
+	gsettings set org.gnome.desktop.background picture-uri "file:///home/$USER/Downloads/wallpaper/screen_background.jpg"
+
+	
+	#Setup xfce4-terminal background
+	mv terminal_background.jpg /home/$USER/Downloads/wallpaper #setup wallpaper for terminal
+
+	if [[ ! -d  /home/$USER/.config/xfce4/xfconf/xfce-perchannel-xml ]]
+	then
+		mkdir -p /home/$USER/.config/xfce4/xfconf/xfce-perchannel-xml 
+	fi
+
+	echo '''<?xml version="1.0" encoding="UTF-8"?>
+
+	<channel name="xfce4-terminal" version="1.0">
+	<property name="background-mode" type="string" value="TERMINAL_BACKGROUND_IMAGE"/>
+	<property name="background-image-shading" type="double" value="0.5"/>
+	<property name="font-name" type="string" value="Agave Nerd Font Mono 12"/>
+	<property name="shortcuts-no-menukey" type="bool" value="false"/>
+	<property name="background-image-file" type="string" value="/home/'''$USER'''/Downloads/wallpaper/terminal_background.jpg"/>
+	<property name="background-image-style" type="string" value="TERMINAL_BACKGROUND_STYLE_FILLED"/>
+	</channel>
+	''' >>/home/$USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-terminal.xml #write setting to xfce4-terminal
+
 fi
 
 
@@ -139,34 +169,6 @@ fi
 
 #Install neovim plugins for current_user
 nvim --headless +"PlugInstall" +qa
-
-#Setup image background
-if [[  ! -d /home/$USER/Downloads/wallpaper ]]
-then
-	mkdir /home/$USER/Downloads/wallpaper
-fi
-mv screen_background.jpg /home/$USER/Downloads/wallpaper
-gsettings set org.gnome.desktop.background picture-uri "file:///home/$USER/Downloads/wallpaper/screen_background.jpg"
-
-#Setup xfce4-terminal background
-mv terminal_background.jpg /home/$USER/Downloads/wallpaper #setup wallpaper for terminal
-
-if [[ ! -d  /home/$USER/.config/xfce4/xfconf/xfce-perchannel-xml ]]
-then
-	mkdir -p /home/$USER/.config/xfce4/xfconf/xfce-perchannel-xml 
-fi
-
-echo '''<?xml version="1.0" encoding="UTF-8"?>
-
-<channel name="xfce4-terminal" version="1.0">
-  <property name="background-mode" type="string" value="TERMINAL_BACKGROUND_IMAGE"/>
-  <property name="background-image-shading" type="double" value="0.5"/>
-  <property name="font-name" type="string" value="Agave Nerd Font Mono 12"/>
-  <property name="shortcuts-no-menukey" type="bool" value="false"/>
-  <property name="background-image-file" type="string" value="/home/'''$USER'''/Downloads/wallpaper/terminal_background.jpg"/>
-  <property name="background-image-style" type="string" value="TERMINAL_BACKGROUND_STYLE_FILLED"/>
-</channel>
-''' >>/home/$USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-terminal.xml
 
 sudo apt update && sudo apt upgrade -y
 reboot
