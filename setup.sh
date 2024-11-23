@@ -1,9 +1,9 @@
 #!usr/bin/bash
 
-#Require login as root user
-if [[ ! $(whoami) =~ 'root' ]]
+#Check if user is root or not
+if [[ $USER == 'root' ]]
 then
-	echo 'You are not root !!'
+	echo 'You are root now,please logout first!!'
 	exit
 fi
 
@@ -20,62 +20,59 @@ then
 	exit
 fi
 
-#get current user
-current_user=`who | awk '{print $1}' | head -n 1`
-
 #install some useful packages
-apt install sqlite3 -y
-apt install tree -y
-apt install keychain -y
-apt install wget -y
-apt install curl -y
-apt install neovim -y
+sudo apt install sqlite3 -y
+sudo apt install tree -y
+sudo apt install keychain -y
+sudo apt install wget -y
+sudo apt install curl -y
+sudo apt install neovim -y
 
-apt update && apt upgrade -y #check package update to prevent conflict
+sudo apt update && sudo apt upgrade -y #check package update to prevent conflict
 
-apt install python3-venv -y
-apt install apache2 -y
-apt install openssh-server -y
-apt install screen -y
-apt install git -y
-apt install silversearcher-ag -y
-apt install libxcb-cursor-dev -y #for matplotlib
+sudo apt install python3-venv -y
+sudo apt install apache2 -y
+sudo apt install openssh-server -y
+sudo apt install screen -y
+sudo apt install git -y
+sudo apt install silversearcher-ag -y
+sudo apt install libxcb-cursor-dev -y #for matplotlib
 
 #check if using gui or not to install packges that support gui
 if [[ ! -z `type Xorg` ]]
 then
 	#install xfce4
-	apt install xfce4-terminal -y
-	update-alternatives --set x-terminal-emulator /usr/bin/xfce4-terminal.wrapper #Set xfce4 as default terminal
+	sudo apt install xfce4-terminal -y
+	sudo update-alternatives --set x-terminal-emulator /usr/bin/xfce4-terminal.wrapper #Set xfce4 as default terminal
 
 	#install media
-	apt install okular -y
-	apt install vlc -y
+	sudo apt install okular -y
+	sudo apt install vlc -y
 	wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-	apt install ./google-chrome-stable_current_amd64.deb -y
+	sudo apt install ./google-chrome-stable_current_amd64.deb -y
 	rm google-chrome-stable_current_amd64.deb
 
 	#grub-customizer 
-	add-apt-repository ppa:danielrichter2007/grub-customizer -y
-	apt update
-	apt install grub-customizer -y
+	sudo add-apt-repository ppa:danielrichter2007/grub-customizer -y
+	sudo apt update
+	sudo apt install grub-customizer -y
 
 	#Custom grub
-	chown -R root:root ubuntu
+	sudo chown -R root:root ubuntu
 	if [[ ! -d /boot/grub/themes ]]
 	then
-		mkdir /boot/grub/themes
+		sudo mkdir /boot/grub/themes
 	fi
-	mv ubuntu /boot/grub/themes
+	sudo mv ubuntu /boot/grub/themes
 
-	chown root:root grub
-	mv grub /etc/default
-	update-grub
+	sudo chown root:root grub
+	sudo mv grub /etc/default
+	sudo update-grub
 
 	#install vietnamese telex
-	add-apt-repository ppa:bamboo-engine/ibus-bamboo -y
-	apt-get update
-	apt-get install ibus ibus-bamboo --install-recommends -y
+	sudo add-apt-repository ppa:bamboo-engine/ibus-bamboo -y
+	sudo apt-get update
+	sudo apt-get install ibus ibus-bamboo --install-recommends -y
 	ibus restart
 
 	# Set ibus-bamboo as default keyboard
@@ -84,47 +81,38 @@ then
 
 
 	#setup nerdfont for nvim-display
-	chown $current_user:$current_user AgaveNerdFont-Regular.ttf
-	if [  ! -d /home/$current_user/.local/share/fonts ]
+	if [  ! -d /home/$USER/.local/share/fonts ]
 	then
-		mkdir /home/$current_user/.local/share/fonts
+		mkdir /home/$USER/.local/share/fonts
 	fi
-	chown $current_user:$current_user /home/$current_user/.local/share/fonts
 
-	mv AgaveNerdFont-Regular.ttf /home/$current_user/.local/share/fonts
+	mv AgaveNerdFontMono-Regular.ttf /home/$USER/.local/share/fonts
 	fc-cache -f -v
 
 fi
 
-#install vim-plug
-sh -c 'curl -fLo "${XDG_DATA_HOME:-/home/'$current_user'/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-chown -R $current_user:$current_user /home/$current_user/.local/share/nvim
 
 #add auto use python virtual environment on startup
-echo '''
-alias py_virtual="source /py_virtual/bin/activate"
-if [[ $(whoami) =~ "root" ]]
-then
-    source /py_virtual/bin/activate
-fi
-''' >>/etc/bash.bashrc 
+sudo bash -c 'echo alias py_virtual=\"source /home/'$USER'/py_virtual/bin/activate\" >> /etc/bash.bashrc'
+sudo bash -c 'echo if [[ \$\(whoami\) == \"root\" ]] >> /etc/bash.bashrc'
+sudo bash -c 'echo then >> /etc/bash.bashrc '
+sudo bash -c 'echo "    source /home/'$USER'/py_virtual/bin/activate" >> /etc/bash.bashrc'
+sudo bash -c 'echo fi >> /etc/bash.bashrc'
 
-echo "source /py_virtual/bin/activate">>/home/$current_user/.bashrc
 
-nvim=`realpath nvim`
+echo 'source /home/'$USER'/py_virtual/bin/activate'>>/home/$USER/.bashrc
 
 #create folder and python virtual environment
-if [ ! -d /py_virtual ]
+if [ ! -d /home/$USER/py_virtual ]
 then
-	mkdir /py_virtual
-	`python3 -m venv /py_virtual`
+	mkdir /home/$USER/py_virtual
+	$(python3 -m venv /home/$USER/py_virtual)
 fi
 
 #install python libraries
-source /py_virtual/bin/activate
+source /home/$USER/py_virtual/bin/activate
 pip install -r requirements.txt
-mv .pylintrc /home/$current_user/
+mv .pylintrc /home/$USER/
 
 #Check if have NVDIA GPU
 echo -en "\a"
@@ -139,28 +127,34 @@ else
 	pip install tensorflow #install tensorflow for cpu
 fi
 
+#install vim-plug
+sh -c 'curl -fLo "${XDG_DATA_HOME:-/home/'$USER'/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
 #Setup for neovim
-if [ ! -d /home/$current_user/.config/nvim ]
+if [ ! -d /home/$USER/.config/nvim ]
 then
-	mv nvim /home/$current_user/.config/nvim
+	mv nvim /home/$USER/.config/nvim
 fi
 
 #Install neovim plugins for current_user
-su -c 'nvim --headless +"PlugInstall" +qa' $current_user
+nvim --headless +"PlugInstall" +qa
 
 #Setup image background
-if [[  ! -d /home/$current_user/Downloads/wallpaper ]]
+if [[  ! -d /home/$USER/Downloads/wallpaper ]]
 then
-	mkdir /home/$current_user/Downloads/wallpaper
+	mkdir /home/$USER/Downloads/wallpaper
 fi
-chown -R $current_user:$current_user /home/$current_user/Downloads/wallpaper
-mv sad_cat.jpg /home/$current_user/Downloads/wallpaper
-gsettings set org.gnome.desktop.background picture-uri "file:///home/$current_user/Downloads/wallpaper/sad_cat.jpg"
+mv screen_background.jpg /home/$USER/Downloads/wallpaper
+gsettings set org.gnome.desktop.background picture-uri "file:///home/$USER/Downloads/wallpaper/screen_background.jpg"
 
 #Setup xfce4-terminal background
-mv fire_cat.jpg /home/$current_user/Downloads/wallpaper #setup wallpaper for terminal
+mv terminal_background.jpg /home/$USER/Downloads/wallpaper #setup wallpaper for terminal
 
-touch xfce4-terminal.xml
+if [[ ! -d  /home/$USER/.config/xfce4/xfconf/xfce-perchannel-xml ]]
+then
+	mkdir -p /home/$USER/.config/xfce4/xfconf/xfce-perchannel-xml 
+fi
 
 echo '''<?xml version="1.0" encoding="UTF-8"?>
 
@@ -169,13 +163,10 @@ echo '''<?xml version="1.0" encoding="UTF-8"?>
   <property name="background-image-shading" type="double" value="0.5"/>
   <property name="font-name" type="string" value="Agave Nerd Font Mono 12"/>
   <property name="shortcuts-no-menukey" type="bool" value="false"/>
-  <property name="background-image-file" type="string" value="/home/'''$current_user'''/Downloads/wallpaper/fire_cat.jpg"/>
+  <property name="background-image-file" type="string" value="/home/'''$USER'''/Downloads/wallpaper/terminal_background.jpg"/>
   <property name="background-image-style" type="string" value="TERMINAL_BACKGROUND_STYLE_FILLED"/>
 </channel>
-''' >>xfce4-terminal.xml
-chown $current_user:$current_user xfce4-terminal.xml
+''' >>/home/$USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-terminal.xml
 
-mv xfce4-terminal.xml /home/$current_user/.config/xfce4/xfconf/xfce-perchannel-xml
-
-apt update && apt upgrade -y
+sudo apt update && sudo apt upgrade -y
 reboot
