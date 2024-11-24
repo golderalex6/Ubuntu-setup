@@ -251,8 +251,8 @@ reboot
 
 <h2 id="contact">☎️<ins>Contact</ins></h2>
 <p>
-    Your Name - <a href="mailto:golderalex6@gmail.com">golderalex6@gmail.com</a><br>
-    Project Link: <a href="https://github.com/golderalex6/Ubuntu-setup">https://github.com/golderalex6/Ubuntu-setup</a>
+    My email - <a href="mailto:golderalex6@gmail.com">golderalex6@gmail.com</a><br>
+    Project Link:<a href="https://github.com/golderalex6/Ubuntu-setup">https://github.com/golderalex6/Ubuntu-setup</a>
 </p>
 
 <hr />
