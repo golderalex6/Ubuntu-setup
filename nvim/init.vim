@@ -177,3 +177,7 @@ EOF
 
 "Function definition
 autocmd FileType python nnoremap <buffer> <silent>fd :lua vim.lsp.buf.hover()<CR>
+
+"Trailing space
+inoremap <expr> = getline('.')[col('.')-1] == '=' ? '=' : ' = '
+nnoremap =  i == 

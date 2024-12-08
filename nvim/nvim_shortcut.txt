@@ -1,6 +1,9 @@
 #Function definition
 Normal mode:fd
 
+#'==' -> ' == ':
+Normal mode: =
+
 #Repl(normal jupyter)
 \ + rt :Open Repl
 \ + rc :Send block code to repl (separate with #%%)
