@@ -102,7 +102,7 @@ let g:floaterm_keymap_kill   = '<F9>'	"Close current terminal
 
 "Vim-airline
 let g:airline#extensions#tabline#enabled = 1
-let g:python3_host_prog='/py_virtual/bin/python3'
+let g:python3_host_prog='~/py_virtual/bin/python3'
 
 "Neomake
 call neomake#configure#automake('nrw', 50)
@@ -175,3 +175,5 @@ require('catppuccin').setup({
 vim.cmd.colorscheme 'catppuccin'
 EOF
 
+"Function definition
+autocmd FileType python nnoremap <buffer> <silent>fd :lua vim.lsp.buf.hover()<CR>
