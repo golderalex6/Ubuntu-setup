@@ -1,8 +1,9 @@
 #Function definition
 Normal mode:fd
 
-#'==' -> ' == ':
-Normal mode: =
+#Code snippet:
+	'==' -> ' == ': Normal mode + =
+	python function : def <Enter> to expand snippets and <C-j>/<C-k> to jump between placeholders
 
 #Repl(normal jupyter)
 \ + rt :Open Repl
