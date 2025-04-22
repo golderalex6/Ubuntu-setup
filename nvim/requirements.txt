@@ -1,0 +1,9 @@
+
+#python
+pynvim
+pylint
+cairosvg
+
+#system
+Ag
+ueberzug

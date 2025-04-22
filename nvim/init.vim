@@ -22,6 +22,8 @@ Plug 'hrsh7th/cmp-nvim-lsp'   " LSP completion source
 Plug 'saadparwaiz1/cmp_luasnip' " Snippets
 Plug 'L3MON4D3/LuaSnip'       " Snippets engine
 
+"code highlight
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 Plug 'Townk/vim-autoclose' " Automatically close parenthesis, etc
 
@@ -63,6 +65,10 @@ Plug 'alvan/vim-closetag'
 
 "Markdown preview
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+
+"Custom code snippets
+Plug 'SirVer/ultisnips'
+
 call plug#end()
 
 colorscheme catppuccin " catppuccin-latte, catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha
@@ -90,23 +96,26 @@ let g:NERDTreeDirArrowExpandable = '▶'
 let g:NERDTreeDirArrowCollapsible = '▼'
 
 "Floaterm
-"Run the current python file
-"nnoremap <silent> <F7> :FloatermNew --autoclose=0 source /py_virtual/bin/activate  && python3 %<CR>
 "Run the current bash file
 autocmd FileType python nnoremap <buffer> <silent> <F7> :FloatermNew --autoclose=0 source /py_virtual/bin/activate  && python3 %<CR>
+
+"Run the current js file
+autocmd FileType javascript nnoremap <buffer> <silent> <F7> :FloatermNew --autoclose=0 node %<CR>
+
+"Run the current python file
 autocmd FileType sh nnoremap <buffer> <silent> <F7> :FloatermNew --autoclose=0 chmod 700 % && source % <CR> 
+
 let g:floaterm_keymap_new ='<F8>'	"Create new terminal
 let g:floaterm_keymap_kill   = '<F9>'	"Close current terminal
-"let g:floaterm_keymap_next   = '<F10>'
-"let g:floaterm_keymap_toggle = '<F12>'
 
 "Vim-airline
 let g:airline#extensions#tabline#enabled = 1
-let g:python3_host_prog='~/py_virtual/bin/python3'
+let g:python3_host_prog='/py_virtual/bin/python3'
 
 "Neomake
 call neomake#configure#automake('nrw', 50)
-let g:neomake_python_enabled_makers = ['pylint']
+let g:neomake_python_enabled_makers = ['pylint'] "python
+let g:neomake_javascript_enabled_makers = ['jshint'] "js
 
 "nvim-repl
 let g:repl_split = 'right'
@@ -114,6 +123,7 @@ autocmd FileType python nnoremap <buffer> <silent> <leader>rt :ReplToggle<CR>
 autocmd FileType python nnoremap <buffer> <silent> <leader>rc :ReplRunCell<CR>
 autocmd FileType python nnoremap <buffer> <silent> <leader>re <Plug>ReplSendLine
 autocmd FileType python vnoremap <buffer> <silent> <leader>re <Plug>ReplSendVisual
+
 
 "indentLine
 let g:indentLine_concealcursor = 'inc'
@@ -126,7 +136,7 @@ autocmd FileType html,markdown,python set omnifunc=htmlcomplete#CompleteTags
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.md,*py'
 
 "snippet for auto create notebook block
-iabbrev @# #%%<CR><CR>#%%<ESC>
+iabbrev @# #%%<CR><CR>#%%<ESC>k
 
 "markdown preview
 " set to 1, nvim will open the preview window after entering the Markdown buffer
@@ -138,11 +148,40 @@ let g:mkdp_auto_close = 1
 
 " Configure LSP and Autocompletion
 lua << EOF
-  local lspconfig = require('lspconfig')
-  local cmp = require('cmp')
+	local lspconfig = require('lspconfig')
+	local cmp = require('cmp')
 
-  -- Enable pyright for Python
-  lspconfig.pyright.setup{}
+	-- Enable pyright for Python
+	lspconfig.pyright.setup{}
+
+	-- JavaScript and TypeScript via tsserver
+	lspconfig.ts_ls.setup{}
+
+	-- HTML
+	lspconfig.html.setup{
+		filetypes = {"html","htmldjango"}
+	}
+
+	-- CSS
+	lspconfig.cssls.setup{}
+
+	-- DockerFile
+	lspconfig.dockerls.setup{}
+
+	-- Bash
+	lspconfig.bashls.setup{}
+
+	-- mysql,sqlite3
+
+	lspconfig.sqlls.setup{
+		filetypes = { 'sql' },
+		root_dir = function(_)
+			return vim.loop.cwd()
+		end,
+	}
+
+
+
 
   -- Autocompletion setup
   cmp.setup({
@@ -151,15 +190,12 @@ lua << EOF
         require('luasnip').lsp_expand(args.body)
       end,
     },
-    mapping = {
-      ['<Tab>'] = cmp.mapping.select_next_item(),
-      ['<S-Tab>'] = cmp.mapping.select_prev_item(),
-      ['<CR>'] = cmp.mapping.confirm({ select = true }),
-    },
-    sources = {
+    mapping = {},
+	sources = {
       { name = 'nvim_lsp' },
       { name = 'luasnip' },
     },
+
   })
 EOF
 
@@ -192,4 +228,12 @@ let g:UltiSnipsJumpBackwardTrigger="<C-k>"
 " Directory for custom snippets
 let g:UltiSnipsSnippetDirectories=["UltiSnips"]
 
+
+" Set line numbers to white
+autocmd ColorScheme * highlight LineNr guifg=#FFFFFF
+autocmd ColorScheme * highlight CursorLineNr guifg=#FFFFFF
+
+" let g:LanguageClient_serverCommands = {
+"     \ 'sql': ['sql-language-server', 'up', '--method', 'stdio'],
+"     \ }
 

@@ -38,6 +38,9 @@ sudo apt install git -y
 sudo apt install silversearcher-ag -y
 sudo apt install libxcb-cursor-dev -y #for matplotlib
 
+#install for js and nvim
+sudo apt install node npm
+
 #check if using gui or not to install packges that support gui
 if [[ ! -z `type Xorg` ]]
 then
