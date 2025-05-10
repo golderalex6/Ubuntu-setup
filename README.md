@@ -91,7 +91,7 @@ sudo apt install libxcb-cursor-dev -y #for matplotlib</code></pre>
 </li>
 
 <li>
-    <p><b> : </b>Checks if the system is running a graphical environment (Xorg). If detected, additional GUI-related software is installed.</p>
+    <p><b>Check if using GUI or CLI : </b>Checks if the system is running a graphical environment (Xorg). If detected, additional GUI-related software is installed.</p>
 <pre><code>if [[ ! -z `type Xorg` ]]
 then
     # GUI-specific installations here
@@ -203,6 +203,18 @@ sudo bash -c 'echo "    source /home/'$USER'/py_virtual/bin/activate" >> /etc/ba
 sudo bash -c 'echo fi >> /etc/bash.bashrc'
 echo 'source /home/'$USER'/py_virtual/bin/activate'>>/home/$USER/.bashrc
 </code></pre>
+</li>
+<li>
+    <p><b>Python management architecture :</b></p>
+<pre>
+Python hosting(Go with OS)
+v
+apt install python3-pip
+v
+pip install uv
+
+</pre>
+
 </li>
 <li>
     <p><b>Create and activate python virtual environment : </b>Creates a global Python virtual environment (/home/$USER/py_virtual) and installs dependencies listed in requirements.txt.</p>

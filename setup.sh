@@ -20,26 +20,22 @@ then
 	exit
 fi
 
+#update normal packages
+sudo apt update && sudo apt upgrade -y
+
 #install some useful packages
-sudo apt install sqlite3 -y
 sudo apt install tree -y
 sudo apt install keychain -y
 sudo apt install wget -y
 sudo apt install curl -y
-sudo apt install neovim -y
 
-sudo apt update && sudo apt upgrade -y #check package update to prevent conflict
-
-sudo apt install python3-venv -y
-sudo apt install apache2 -y
 sudo apt install openssh-server -y
 sudo apt install screen -y
-sudo apt install git -y
-sudo apt install silversearcher-ag -y
-sudo apt install libxcb-cursor-dev -y #for matplotlib
+sudo apt install tmux -y
 
-#install for js and nvim
-sudo apt install node npm
+sudo apt install git -y
+sudo apt install nodejs npm -y
+
 
 #check if using gui or not to install packges that support gui
 if [[ ! -z `type Xorg` ]]
@@ -49,7 +45,6 @@ then
 	sudo update-alternatives --set x-terminal-emulator /usr/bin/xfce4-terminal.wrapper #Set xfce4 as default terminal
 
 	#install media
-	sudo apt install okular -y
 	sudo apt install vlc -y
 	wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 	sudo apt install ./google-chrome-stable_current_amd64.deb -y
@@ -124,54 +119,31 @@ then
 
 fi
 
+#create the main python venv(manage other venvs)
+apt install python3-venv
+if [ ! -d /py_virtual ]
+then
+	mkdir /py_virtual
+	$(python3 -m venv /py_virtual)
+fi
+
 
 #add auto use python virtual environment on startup
-sudo bash -c 'echo alias py_virtual=\"source /home/'$USER'/py_virtual/bin/activate\" >> /etc/bash.bashrc'
 sudo bash -c 'echo if [[ \$\(whoami\) == \"root\" ]] >> /etc/bash.bashrc'
 sudo bash -c 'echo then >> /etc/bash.bashrc '
-sudo bash -c 'echo "    source /home/'$USER'/py_virtual/bin/activate" >> /etc/bash.bashrc'
+sudo bash -c 'echo "    source /py_virtual/bin/activate" >> /etc/bash.bashrc'
 sudo bash -c 'echo fi >> /etc/bash.bashrc'
 
+echo 'source /py_virtual/bin/activate'>>/home/$USER/.bashrc
 
-echo 'source /home/'$USER'/py_virtual/bin/activate'>>/home/$USER/.bashrc
-
-#create folder and python virtual environment
-if [ ! -d /home/$USER/py_virtual ]
-then
-	mkdir /home/$USER/py_virtual
-	$(python3 -m venv /home/$USER/py_virtual)
-fi
 
 #install python libraries
-source /home/$USER/py_virtual/bin/activate
-pip install -r requirements.txt
+source /py_virtual/bin/activate
+pip install pynvim
+pip install pylint
+pip install autopep8
+pip install pyright
+
 mv .pylintrc /home/$USER/
 
-#Check if have NVDIA GPU
-echo -en "\a"
-if [[ `lspci | grep VGA | grep NVIDIA` != '' ]]
-then
-	echo 'You have NVIDIA GPU,install tensorflow for GPU'
-	sleep 5
-	pip install tensorflow[and-cuda] #intstall tensorflow for gpu
-else
-	echo "You don't have NVIDIA GPU,install tensorflow for CPU"
-	sleep 5
-	pip install tensorflow #install tensorflow for cpu
-fi
-
-#install vim-plug
-sh -c 'curl -fLo "${XDG_DATA_HOME:-/home/'$USER'/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-
-#Setup for neovim
-if [ ! -d /home/$USER/.config/nvim ]
-then
-	mv nvim /home/$USER/.config/nvim
-fi
-
-#Install neovim plugins for current_user
-nvim --headless +"PlugInstall" +qa
-
-sudo apt update && sudo apt upgrade -y
 reboot

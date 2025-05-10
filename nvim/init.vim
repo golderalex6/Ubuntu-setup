@@ -69,9 +69,13 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': 
 "Custom code snippets
 Plug 'SirVer/ultisnips'
 
+
+"Multi db DBMS
+Plug 'tpope/vim-dadbod'
+Plug 'kristijanhusak/vim-dadbod-ui'
+
 call plug#end()
 
-colorscheme catppuccin " catppuccin-latte, catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha
 
 set number
 set smartindent
@@ -81,11 +85,27 @@ set shiftround
 set virtualedit+=onemore
 
 
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+nnoremap <C-w>l <C-w>v
+nnoremap <C-w>j <C-w>s
+
+nnoremap <silent>  <C-Up>    :resize -3<CR>
+nnoremap <silent>  <C-Down>  :resize +3<CR>
+nnoremap <silent>  <C-Left>  :vertical resize -3<CR>
+nnoremap <silent> <C-Right> :vertical resize +3<CR>
+
+
+colorscheme catppuccin " catppuccin-latte, catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha
+
+"NERDTREE
+let NERDTreeShowHidden=1
 nnoremap <silent> <F2> :bprevious <CR>	"Move to next buffer
 nnoremap <silent> <F3> :bnext <CR>	"Move to previous buffer
 nnoremap <silent> <F4> :bw<CR>	"remove buffer
-"NERDTREE
-let NERDTreeShowHidden=1
 nnoremap <silent><F1> :NERDTreeRefreshRoot<CR>	"Refresh NerdTree
 nnoremap <silent> <F5> :NERDTreeToggle<CR>	"Open NerdTree
 nnoremap <silent> <F6> :NERDTreeFocus<CR>	"Close NerdTree
@@ -110,12 +130,23 @@ let g:floaterm_keymap_kill   = '<F9>'	"Close current terminal
 
 "Vim-airline
 let g:airline#extensions#tabline#enabled = 1
-let g:python3_host_prog='/py_virtual/bin/python3'
+let g:python3_host_prog=expand('/py_virtual/bin/python3')
+
 
 "Neomake
 call neomake#configure#automake('nrw', 50)
 let g:neomake_python_enabled_makers = ['pylint'] "python
+let g:neomake_python_pylint_maker = {
+    \ 'exe': '/py_virtual/bin/pylint',
+    \ 'args': ['--rcfile=.pylintrc'],
+    \ 'errorformat':
+    \ '%A%f:%l: [%t%n] %m,' .
+    \ '%A%f:%l: %m,' .
+    \ '%C%m,' .
+    \ '%Z%m',
+    \ }
 let g:neomake_javascript_enabled_makers = ['jshint'] "js
+
 
 "nvim-repl
 let g:repl_split = 'right'
@@ -138,20 +169,13 @@ let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.md,*py'
 "snippet for auto create notebook block
 iabbrev @# #%%<CR><CR>#%%<ESC>k
 
-"markdown preview
-" set to 1, nvim will open the preview window after entering the Markdown buffer
-let g:mkdp_auto_start = 1
-" set to 1, the nvim will auto close current preview window when changing
-" from Markdown buffer to another buffer
-let g:mkdp_auto_close = 1
-
 
 " Configure LSP and Autocompletion
 lua << EOF
 	local lspconfig = require('lspconfig')
 	local cmp = require('cmp')
 
-	-- Enable pyright for Python
+	-- Python
 	lspconfig.pyright.setup{}
 
 	-- JavaScript and TypeScript via tsserver
@@ -165,14 +189,11 @@ lua << EOF
 	-- CSS
 	lspconfig.cssls.setup{}
 
-	-- DockerFile
-	lspconfig.dockerls.setup{}
 
 	-- Bash
 	lspconfig.bashls.setup{}
 
 	-- mysql,sqlite3
-
 	lspconfig.sqlls.setup{
 		filetypes = { 'sql' },
 		root_dir = function(_)
@@ -180,7 +201,26 @@ lua << EOF
 		end,
 	}
 
+	--nginx.conf
+	lspconfig.nginx_language_server.setup{}
 
+	-- DockerFile
+	lspconfig.dockerls.setup{}
+
+	
+	--go to the function code
+	vim.api.nvim_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', { noremap=true, silent=true })
+
+	-- in your init.lua or a Lua config file
+	vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+	pattern = { 'docker-compose.yaml', 'docker-compose.yml', 'compose.yaml', 'compose.yml' }, -- match files by extension or filename
+	callback = function()
+		vim.bo.filetype = "yaml.docker-compose"
+	end,
+	})
+
+	--Docker-compose
+	lspconfig.docker_compose_language_service.setup{}
 
 
   -- Autocompletion setup
@@ -199,6 +239,7 @@ lua << EOF
   })
 EOF
 
+
 " catppuccin trasnparent
 lua << EOF
 require('catppuccin').setup({
@@ -213,6 +254,7 @@ EOF
 
 "Function definition
 autocmd FileType python nnoremap <buffer> <silent>fd :lua vim.lsp.buf.hover()<CR>
+autocmd FileType javascript nnoremap <buffer> <silent>fd :lua vim.lsp.buf.hover()<CR>
 
 "Trailing space
 inoremap <expr> = getline('.')[col('.')-1] == '=' ? '=' : ' = '
@@ -233,7 +275,15 @@ let g:UltiSnipsSnippetDirectories=["UltiSnips"]
 autocmd ColorScheme * highlight LineNr guifg=#FFFFFF
 autocmd ColorScheme * highlight CursorLineNr guifg=#FFFFFF
 
-" let g:LanguageClient_serverCommands = {
-"     \ 'sql': ['sql-language-server', 'up', '--method', 'stdio'],
-"     \ }
+" Markdown preview
+" set to 1, nvim will open the preview window after entering the Markdown buffer
+" default: 0
+let g:mkdp_auto_start = 0
+" set to 1, the nvim will auto close current preview window when changing
+" from Markdown buffer to another buffer
+" default: 1
+let g:mkdp_auto_close = 0
+
+"vim-dadbod
+let g:db_ui_use_nerd_fonts = 1
 

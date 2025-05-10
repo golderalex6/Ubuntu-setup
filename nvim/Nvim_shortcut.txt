@@ -1,6 +1,9 @@
 #Function definition
 Normal mode:fd
 
+#Go to function code
+Normal mode:gd
+
 #Code snippet:
 	'==' -> ' == ': Normal mode + =
 	python function : def <Enter> to expand snippets and <C-j>/<C-k> to jump between placeholders
@@ -22,7 +25,18 @@ u : undo
 : + %s/old_word/new_word 
 
 #Move between split screen
-Ctr + w + h/j/k/l : move left,down,up,right
+Ctr + h/j/k/l : move left,down,up,right
+
+#Split screen
+Ctr + w + l:split vertical
+Ctr + w + j:split horizental
+
+#Change window size
+Ctr + Up:go up 3 unit
+Ctr + Down:go down 3 unit
+Ctr + Left:go left 3 unit
+Ctr + Right:go right 3 unit
+
 
 #Comment
 gcc : comment current line
@@ -53,10 +67,12 @@ select the text you want to indent/unindent
 <F5> : Open NerdTree
 <F6> : Move from buffer to NerdTree
 
+
 #File save/quit
 : + w : save the file
 : + w + q : save and quite
 : + q + ! : quit but not save
+: + q + a + ! : quit from all opening tabs/window/buffer
 
 #Convert mode (i for Insert Mode,v for Visual Mode,escape for return to Normal Mode,: for command mode)
 	+Insert Mode for input text
