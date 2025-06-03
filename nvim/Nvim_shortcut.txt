@@ -1,3 +1,6 @@
+#Markdown preview
+:MarkdownPreview
+
 #Function definition
 Normal mode:fd
 
@@ -54,18 +57,19 @@ select the text you want to indent/unindent
 > : indent one more tab
 < : unindent one more tab:
 
-#Terminal
-<F7> : Run curren Python,Js,Bash file
-<F8> : Open terminal
-<F9> : Close current terminal
 
-#Buffer/NerdTree
-<F1> : Refresh NerdTree
+#Buffer
+<F1> : Delete window
 <F2> : move to next buffer
 <F3> : move to previous buffer
 <F4> : Close the current buffer
-<F5> : Open NerdTree
-<F6> : Move from buffer to NerdTree
+<F5> : open file browser
+<F6> : open word searching
+
+
+<F7> : Run current openning Python,Js,Bash file
+<F8> : open DBUI ( dadbod-nvim )
+<F9> : open gen A.i option (gen.nvim)
 
 
 #File save/quit

@@ -36,6 +36,9 @@ sudo apt install tmux -y
 sudo apt install git -y
 sudo apt install nodejs npm -y
 
+sudo apt install docker-buildx-plugin docker-ce docker-ce-cli docker-ce-rootless-extras docker-compose-plugin -y
+
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
 #check if using gui or not to install packges that support gui
 if [[ ! -z `type Xorg` ]]
@@ -119,6 +122,14 @@ then
 
 fi
 
+
+#install drawdb
+git clone https://github.com/drawdb-io/drawdb
+cd drawdb
+docker build -t drawdb .
+docker create --name drawdb_container -p 8080:80 drawdb
+
+
 #create the main python venv(manage other venvs)
 apt install python3-venv
 if [ ! -d /py_virtual ]
@@ -140,10 +151,14 @@ echo 'source /py_virtual/bin/activate'>>/home/$USER/.bashrc
 #install python libraries
 source /py_virtual/bin/activate
 pip install pynvim
-pip install pylint
-pip install autopep8
 pip install pyright
+pip install cookiecutter
 
-mv .pylintrc /home/$USER/
 
 reboot
+
+
+#wish list
+#add cookiecutter template into
+#create service for run drawdb everytime turn pc on
+

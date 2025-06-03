@@ -2,13 +2,6 @@ call plug#begin('~/.config/nvim/Plugins')
 
 Plug 'catppuccin/nvim', { 'as': 'catppuccin' } 		"Theme
 
-"File browser
-Plug 'preservim/nerdtree'		"Main
-Plug 'ryanoasis/vim-devicons'	"Icon
-Plug 'Xuyuanp/nerdtree-git-plugin'	"Git status
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'	"Syntax highlight
-Plug 'PhilRunninger/nerdtree-buffer-ops'	"Display open buffer
-
 "Status Bar
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -17,6 +10,8 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'voldikss/vim-floaterm'
 
 Plug 'neovim/nvim-lspconfig'  " Language Server Protocol
+Plug 'folke/trouble.nvim'
+
 Plug 'hrsh7th/nvim-cmp'       " Completion engine
 Plug 'hrsh7th/cmp-nvim-lsp'   " LSP completion source
 Plug 'saadparwaiz1/cmp_luasnip' " Snippets
@@ -27,13 +22,15 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 Plug 'Townk/vim-autoclose' " Automatically close parenthesis, etc
 
-Plug 'neomake/neomake' "To add pylint as a plugin
+Plug 'mfussenegger/nvim-lint' "linter
 
 Plug 'f-person/git-blame.nvim' "Git checking
 
 Plug 'Pocco81/auto-save.nvim' "Autosave
 
 Plug 'farmergreg/vim-lastplace' "Continue where you left off
+
+Plug 'lewis6991/hover.nvim' "nvim-hover
 
 "HTML autocomplete 
 Plug 'mattn/emmet-vim'
@@ -43,9 +40,9 @@ Plug 'jiangmiao/auto-pairs' "Auto indent after space for parenthesis
 
 Plug 'tpope/vim-commentary' "For comment multiple line
 
-"fzf
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
+
+Plug 'David-Kunz/gen.nvim' "A.i model
+
 
 "Text finder
 Plug 'rking/ag.vim'
@@ -54,8 +51,6 @@ Plug 'rking/ag.vim'
 Plug 'tpope/vim-repeat'
 Plug 'pappasam/nvim-repl'
 
-"Indentation line
-Plug 'Yggdroot/indentLine'
 
 "parenthese surround
 Plug 'tpope/vim-surround'
@@ -69,13 +64,18 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': 
 "Custom code snippets
 Plug 'SirVer/ultisnips'
 
-
 "Multi db DBMS
 Plug 'tpope/vim-dadbod'
 Plug 'kristijanhusak/vim-dadbod-ui'
 
-call plug#end()
 
+"Start up
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-file-browser.nvim'
+Plug 'startup-nvim/startup.nvim'
+
+call plug#end()
 
 set number
 set smartindent
@@ -98,6 +98,13 @@ nnoremap <silent>  <C-Down>  :resize +3<CR>
 nnoremap <silent>  <C-Left>  :vertical resize -3<CR>
 nnoremap <silent> <C-Right> :vertical resize +3<CR>
 
+"remove left-margin
+set fillchars=eob:\ 
+
+
+"use for scroll up/down faster
+nnoremap J 7j
+nnoremap K 7k
 
 colorscheme catppuccin " catppuccin-latte, catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha
 
@@ -106,46 +113,38 @@ let NERDTreeShowHidden=1
 nnoremap <silent> <F2> :bprevious <CR>	"Move to next buffer
 nnoremap <silent> <F3> :bnext <CR>	"Move to previous buffer
 nnoremap <silent> <F4> :bw<CR>	"remove buffer
-nnoremap <silent><F1> :NERDTreeRefreshRoot<CR>	"Refresh NerdTree
-nnoremap <silent> <F5> :NERDTreeToggle<CR>	"Open NerdTree
-nnoremap <silent> <F6> :NERDTreeFocus<CR>	"Close NerdTree
-" Exit Vim if NERDTree is the only window remaining in the only tab.
-"autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+
+
+"exit window
+nnoremap <silent> <F1> :q<CR>
+
+" Map F5 to Telescope find_files
+nnoremap <silent> <F5> :Telescope file_browser<CR>
+
+" Map F6 to Telescope live_grep
+nnoremap <silent> <F6> :Telescope live_grep<CR>
+
+"Map F8 to go to dadbod nvim
+nnoremap <silent> <F8> :DBUI<CR>
+
 
 let g:NERDTreeDirArrowExpandable = '▶'
 let g:NERDTreeDirArrowCollapsible = '▼'
 
 "Floaterm
-"Run the current bash file
-autocmd FileType python nnoremap <buffer> <silent> <F7> :FloatermNew --autoclose=0 source /py_virtual/bin/activate  && python3 %<CR>
+"Run the current python file
+autocmd FileType python nnoremap <buffer> <silent> <F7> :FloatermNew --autoclose=0 python3 %<CR>
 
 "Run the current js file
 autocmd FileType javascript nnoremap <buffer> <silent> <F7> :FloatermNew --autoclose=0 node %<CR>
 
-"Run the current python file
+"Run the current bash file
 autocmd FileType sh nnoremap <buffer> <silent> <F7> :FloatermNew --autoclose=0 chmod 700 % && source % <CR> 
 
-let g:floaterm_keymap_new ='<F8>'	"Create new terminal
-let g:floaterm_keymap_kill   = '<F9>'	"Close current terminal
 
 "Vim-airline
 let g:airline#extensions#tabline#enabled = 1
 let g:python3_host_prog=expand('/py_virtual/bin/python3')
-
-
-"Neomake
-call neomake#configure#automake('nrw', 50)
-let g:neomake_python_enabled_makers = ['pylint'] "python
-let g:neomake_python_pylint_maker = {
-    \ 'exe': '/py_virtual/bin/pylint',
-    \ 'args': ['--rcfile=.pylintrc'],
-    \ 'errorformat':
-    \ '%A%f:%l: [%t%n] %m,' .
-    \ '%A%f:%l: %m,' .
-    \ '%C%m,' .
-    \ '%Z%m',
-    \ }
-let g:neomake_javascript_enabled_makers = ['jshint'] "js
 
 
 "nvim-repl
@@ -175,8 +174,29 @@ lua << EOF
 	local lspconfig = require('lspconfig')
 	local cmp = require('cmp')
 
-	-- Python
+	-- Ruff-Python
 	lspconfig.pyright.setup{}
+	local lint = require("lint")
+
+	lint.linters_by_ft = {
+		python = { "ruff" },
+		javascript = { "eslint" },
+		lua = { "luacheck" },
+	}
+
+	vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter", "InsertLeave" }, {
+	callback = function()
+		lint.try_lint()
+	end,
+	})
+
+	vim.diagnostic.config({
+		virtual_text = true,
+		signs = true,
+		underline = true,
+	})
+
+
 
 	-- JavaScript and TypeScript via tsserver
 	lspconfig.ts_ls.setup{}
@@ -208,8 +228,6 @@ lua << EOF
 	lspconfig.dockerls.setup{}
 
 	
-	--go to the function code
-	vim.api.nvim_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', { noremap=true, silent=true })
 
 	-- in your init.lua or a Lua config file
 	vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
@@ -243,14 +261,15 @@ EOF
 " catppuccin trasnparent
 lua << EOF
 require('catppuccin').setup({
-    transparent_background = true, -- Enable transparency
+    transparent_background = false, -- Enable transparency
     integrations = {
         treesitter = true, -- Enable Treesitter integration
         lsp_trouble = true, -- Enable LSP Trouble integration
     },
 })
-vim.cmd.colorscheme 'catppuccin'
+vim.cmd.colorscheme 'default'
 EOF
+
 
 "Function definition
 autocmd FileType python nnoremap <buffer> <silent>fd :lua vim.lsp.buf.hover()<CR>
@@ -287,3 +306,145 @@ let g:mkdp_auto_close = 0
 "vim-dadbod
 let g:db_ui_use_nerd_fonts = 1
 
+lua<<EOF
+require('telescope').setup {
+  extensions = {
+    file_browser = {
+      hidden = { file_browser = true, folder_browser = true }, -- Set both to true
+      no_ignore = true,
+	  depth = 1,
+      -- You might also want to set no_ignore to true if you want to ignore .gitignore
+    },
+  },
+}
+require('telescope').load_extension('file_browser')
+EOF
+
+
+lua << EOF
+require("startup").setup({
+    header = {
+        type = "text",
+        align = "center",
+        fold_section = false,
+        title = "Header",
+        margin = 5,
+        content = require("startup.headers").hydra_header,
+        highlight = "Statement",
+        default_color = "",
+        oldfiles_amount = 0,
+    },
+    header_2 = {
+        type = "text",
+        oldfiles_directory = false,
+        align = "center",
+        fold_section = false,
+        title = "Quote",
+        margin = 5,
+        content = {"Extremely fast,","Lightweight as fuck,","Setup in under a minute !!","    --TranHongLoan/golderalex"},
+        highlight = "Constant",
+        default_color = "",
+        oldfiles_amount = 0,
+    },
+    -- name which will be displayed and command
+    body = {
+        type = "mapping",
+        oldfiles_directory = false,
+        align = "center",
+        fold_section = false,
+        title = "Basic Commands",
+        margin = 5,        content = {
+            { " File Browser", "Telescope file_browser", "<leader>fb" },
+            { " Database", "DBUI", "F8" },
+            { " Find File", "Telescope find_files", "<leader>ff" },
+            { " New File", "lua require'startup'.new_file()", "<leader>nf" },
+            { "󰍉 Find Word", "Telescope live_grep", "<leader>lg" },
+            { " Colorschemes", "Telescope colorscheme", "<leader>cs" },
+        },
+        highlight = "String",
+        default_color = "",
+        oldfiles_amount = 0,
+    },
+
+    clock = {
+        type = "text",
+        content = function()
+            local clock = " " .. os.date("%H:%M")
+            local date = " " .. os.date("%d-%m-%y")
+            return { clock, date }
+        end,
+        oldfiles_directory = false,
+        align = "center",
+        fold_section = false,
+        title = "",
+        margin = 5,
+        highlight = "TSString",
+        default_color = "#FFFFFF",
+        oldfiles_amount = 10,
+    },
+
+    footer_2 = {
+        type = "text",
+        content = require("startup.functions").packer_plugins(),
+        oldfiles_directory = false,
+        align = "center",
+        fold_section = false,
+        title = "",
+        margin = 5,
+        highlight = "TSString",
+        default_color = "#FFFFFF",
+        oldfiles_amount = 10,
+    },
+
+    options = {
+        after = function()
+            require("startup.utils").oldfiles_mappings()
+        end,
+        mapping_keys = true,
+        cursor_column = 0.5,
+        empty_lines_between_mappings = true,
+        disable_statuslines = true,
+        paddings = { 2, 2, 2, 2, 2, 2, 2 },
+    },
+    colors = {
+        background = "#1f2227",
+        folded_section = "#56b6c2",
+    },
+    parts = {
+        "header",
+        "header_2",
+        "body",
+        "clock",
+        "footer_2",
+    },
+}
+)
+EOF
+
+
+lua<<EOF
+require("gen").setup {
+  model = "llama3.2", -- Default model
+  quit_map = "q", -- Close window keymap
+  retry_map = "<c-r>", -- Retry keymap
+  accept_map = "<c-cr>", -- Accept result keymap
+  host = "localhost", -- Ollama host
+  port = "11434", -- Ollama port
+  display_mode = "float", -- Display mode
+  show_prompt = false, -- Hide prompt
+  show_model = false, -- Hide model name
+  no_auto_close = false, -- Auto close
+  file = false,
+  hidden = false,
+  init = function(options)
+    pcall(io.popen, "ollama serve > /dev/null 2>&1 &")
+  end,
+  command = function(options)
+    local body = { model = options.model, stream = true }
+    return "curl --silent --no-buffer -X POST http://" .. options.host .. ":" .. options.port .. "/api/chat -d $body"
+  end,
+  result_filetype = "markdown",
+  debug = false
+}
+EOF
+noremap <silent> <F9> :Gen<CR>
