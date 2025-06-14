@@ -157,8 +157,12 @@ pip install cookiecutter
 
 reboot
 
-
 #wish list
-#add cookiecutter template into
+
 #create service for run drawdb everytime turn pc on
+
+#setup for Tabby
+#setup for Tabby
+#setup for zsh shell and ohmyzsh
+#setup startship
 

@@ -1,4 +1,5 @@
 #install neovim
+sudo apt install curl
 curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
 sudo rm -rf /opt/nvim
 sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
@@ -20,9 +21,10 @@ fi
 nvim --headless +"PlugInstall" +qa
 
 sudo apt install nodejs npm git -y #required packages
+sudo apt install lua-check #for telescope.nvim
 
 sudo apt install silversearcher-ag -y #for searching text in project
-apt install ripgrep
+sudo apt install ripgrep
 
 sudo npm install -g pyright #python lsp
 sudo npm install -g typescript-language-server #for js,ts lsp

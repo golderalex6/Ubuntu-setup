@@ -42,6 +42,10 @@ Plug 'tpope/vim-commentary' "For comment multiple line
 
 
 Plug 'David-Kunz/gen.nvim' "A.i model
+"A.i model
+Plug 'Kurama622/llm.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'MunifTanjim/nui.nvim'
 
 
 "Text finder
@@ -131,15 +135,17 @@ nnoremap <silent> <F8> :DBUI<CR>
 let g:NERDTreeDirArrowExpandable = '▶'
 let g:NERDTreeDirArrowCollapsible = '▼'
 
+
 "Floaterm
 "Run the current python file
 autocmd FileType python nnoremap <buffer> <silent> <F7> :FloatermNew --autoclose=0 python3 %<CR>
-
 "Run the current js file
 autocmd FileType javascript nnoremap <buffer> <silent> <F7> :FloatermNew --autoclose=0 node %<CR>
-
 "Run the current bash file
 autocmd FileType sh nnoremap <buffer> <silent> <F7> :FloatermNew --autoclose=0 chmod 700 % && source % <CR> 
+tnoremap <Esc> <C-\><C-n> :FloatermKill <CR>
+
+
 
 
 "Vim-airline
@@ -275,6 +281,10 @@ EOF
 autocmd FileType python nnoremap <buffer> <silent>fd :lua vim.lsp.buf.hover()<CR>
 autocmd FileType javascript nnoremap <buffer> <silent>fd :lua vim.lsp.buf.hover()<CR>
 
+autocmd FileType python nnoremap <buffer> <silent>gd :lua vim.lsp.buf.definition()<CR>
+autocmd FileType javascript nnoremap <buffer> <silent>gd :lua vim.lsp.buf.definition()<CR>
+
+
 "Trailing space
 inoremap <expr> = getline('.')[col('.')-1] == '=' ? '=' : ' = '
 nnoremap =  i == 
@@ -306,19 +316,32 @@ let g:mkdp_auto_close = 0
 "vim-dadbod
 let g:db_ui_use_nerd_fonts = 1
 
-lua<<EOF
-require('telescope').setup {
+lua << EOF
+local fb_actions = require("telescope").extensions.file_browser.actions
+
+require('telescope').setup({
   extensions = {
     file_browser = {
-      hidden = { file_browser = true, folder_browser = true }, -- Set both to true
+      hijack_netrw = true,
+      grouped = true,
+      hidden = { file_browser = true, folder_browser = true },
       no_ignore = true,
-	  depth = 1,
-      -- You might also want to set no_ignore to true if you want to ignore .gitignore
+      depth = 1,
+      mappings = {
+        ["n"] = {
+          ["c"] = fb_actions.create,
+          ["r"] = fb_actions.rename,
+          ["d"] = fb_actions.remove,
+          ["m"] = fb_actions.move,
+        },
+      },
     },
   },
-}
+})
+
 require('telescope').load_extension('file_browser')
 EOF
+
 
 
 lua << EOF
@@ -329,7 +352,40 @@ require("startup").setup({
         fold_section = false,
         title = "Header",
         margin = 5,
-        content = require("startup.headers").hydra_header,
+        --content = require("startup.headers").hydra_header,
+        content = {
+    [[          ▀████▀▄▄              ▄█ ]],
+    [[            █▀    ▀▀▄▄▄▄▄    ▄▄▀▀█ ]],
+    [[    ▄        █          ▀▀▀▀▄  ▄▀  ]],
+    [[   ▄▀ ▀▄      ▀▄              ▀▄▀  ]],
+    [[  ▄▀    █     █▀   ▄█▀▄      ▄█    ]],
+    [[  ▀▄     ▀▄  █     ▀██▀     ██▄█   ]],
+    [[   ▀▄    ▄▀ █   ▄██▄   ▄  ▄  ▀▀ █  ]],
+    [[    █  ▄▀  █    ▀██▀    ▀▀ ▀▀  ▄▀  ]],
+    [[   █   █  █      ▄▄           ▄▀   ]],
+},
+		content = {
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣿⡋⠙⠳⠦⣄⣀⠀⠀⠀⠀⠀⠀⢀⢀⣀⣀⣀⣀⣀⣀⡀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠴⠶⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⡼⣿⣻⣴⣀⠈⠙⢶⣤⣠⡴⠶⠛⠉⢉⣉⠉⠁⠈⠉⠉⠉⠙⠛⠶⢤⣀⡀⢀⡤⠒⠉⠁⠀⠀⠀⢀⣬⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣷⢻⣽⢷⣻⣟⣦⠾⠉⠁⣠⣤⡶⠟⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣽⠟⠉⠀⠀⠀⠀⢀⣠⣴⣿⡻⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣎⢿⣻⣽⠞⠁⢠⣴⡿⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⡃⠀⠀⠀⣠⣤⣾⣟⣯⡷⡟⣹⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣮⡟⠁⢠⣼⡿⠏ ⠀ ⠀     _⠀⠀_   ⢹⣧⠀⣰⣾⢿⣽⡾⣽⣳⣿⣫⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀  ]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⠏⠀⣰⡿⣯⠃   |\\⠀| |_ | |⠀ ⠀⠻⣦⡹⣯⡿⣾⣽⢿⣽⡾⠃⠀⠀⠀⠀⠀⠀      ]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠇⠀⣸⡿⣽⠃    | \\| |_ |_|⠀ ⠀⠀ ⠛⠶⣽⣓⣯⣿⢿⣅⠘⠀⠀⠀⠀⠀⠀  ⠀⠀ ⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⠀⣰⣿⣻⢿⠀            .       ⠀⠀⠀ ⢩⣭⡍⠀⢻⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⡇⠀⣾⢷⣻⣿⠀⣀⣀⣀⡀⠀  \  /⠀| |\\  /| ⠀⢀⣾⣯⢷⠀⢈⣇⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⢰⣯⣿⣻⣞⡿⣿⡽⣯⢿⡷⣦⣀⠀\/⠀⠀| | \\/ |⠀⢀⣼⣟⡾⣿⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⡀⠈⣿⣞⡷⣟⣿⣳⣿⣻⢯⣿⡽⣯⣧⡀            ⢀⣾⣽⢾⡿⣽⠂⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣇⠀⢹⣾⣟⣯⣷⢿⡾⣽⣟⡷⣿⢯⣷⢿⣤⠀⠀⠀⠀  ⠀⠀⠀⢀⣴⣿⣻⢾⣻⣽⠿⠀⢐⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡀⠈⢷⣯⣟⣾⢿⣽⣟⡾⣿⡽⣿⢾⣻⣽⣳⣄⡀⡀⠀⣀⣀⣤⡶⣟⡿⣾⡽⣟⣯⣟⠇⠀⣼⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢧⠀⠘⢟⣾⢯⣿⢾⣽⣻⢷⣟⣯⡿⣯⣷⢿⡽⣿⣻⣟⣯⢿⣞⣿⣻⣽⡷⣿⣻⣽⠎⠀⣰⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢧⡀⠈⢻⣯⣟⣯⣷⢿⣯⣟⡷⣿⣽⢾⣻⣟⡷⣿⣽⢾⡿⣽⡾⣯⡷⣿⣳⡿⠉⠀⣰⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣄⠀⠙⢾⣻⢾⣟⣾⣽⣻⢷⣯⣿⣻⢾⣟⣷⣯⢿⣻⣽⣻⢷⣟⡯⠗⠁⢠⡞⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⣄⡀⠉⠻⢾⣻⣞⣯⣿⣞⡷⣿⣻⡾⣷⣻⢿⣽⣳⡿⠯⠋⠀⣠⠶⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⠦⣄⡀⠈⠉⠓⠛⠾⠟⠷⠿⠽⠷⠟⠛⠉⠁⠀⣠⡴⠞⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠛⠶⡤⣤⣠⣤⣀⣀⣠⣤⡤⠤⠶⠞⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+			[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]],
+		},
         highlight = "Statement",
         default_color = "",
         oldfiles_amount = 0,
@@ -341,7 +397,7 @@ require("startup").setup({
         fold_section = false,
         title = "Quote",
         margin = 5,
-        content = {"Extremely fast,","Lightweight as fuck,","Setup in under a minute !!","    --TranHongLoan/golderalex"},
+        content = {"Extremely fast, lightweight as fuck, setup in under a minute !!","    --TranHongLoan/golderalex"},
         highlight = "Constant",
         default_color = "",
         oldfiles_amount = 0,
@@ -421,6 +477,29 @@ require("startup").setup({
 )
 EOF
 
+lua << EOF
+-- Also unmap on FileType event to cover initial buffer load
+vim.api.nvim_create_autocmd({ "BufEnter", "FileType" }, {
+  callback = function()
+    if vim.bo.filetype == "startup" then
+	--Disable for prevent suddenly call when open
+      pcall(vim.keymap.del, "n", "<F4>") 
+      pcall(vim.keymap.del, "n", "<F5>") 
+      pcall(vim.keymap.del, "n", "<F6>") 
+    end
+  end,
+})
+
+-- Restore on leaving buffer
+vim.api.nvim_create_autocmd("BufLeave", {
+  callback = function()
+    vim.keymap.set("n", "<F4>", ":bw<CR>", { silent = true })
+    vim.keymap.set("n", "<F5>", ":Telescope file_browser<CR>", { silent = true })
+    vim.keymap.set("n", "<F6>", ":Telescope live_grep<CR>", { silent = true })
+  end,
+})
+EOF
+
 
 lua<<EOF
 require("gen").setup {
@@ -448,3 +527,77 @@ require("gen").setup {
 }
 EOF
 noremap <silent> <F9> :Gen<CR>
+
+
+lua<<EOF
+local tools = require("llm.tools") -- Required for app_handler
+local function local_llm_streaming_handler(chunk, ctx, F)
+  if not chunk then
+    return ctx.assistant_output
+  end
+
+  local tail = chunk:sub(-1, -1)
+  if tail ~= "}" then
+    ctx.line = ctx.line .. chunk
+  else
+    ctx.line = ctx.line .. chunk
+    local status, data = pcall(vim.fn.json_decode, ctx.line)
+    if not status or not data.message or not data.message.content then
+      return ctx.assistant_output
+    end
+    ctx.assistant_output = ctx.assistant_output .. data.message.content
+    F.WriteContent(ctx.bufnr, ctx.winid, data.message.content)
+    ctx.line = ""
+  end
+  return ctx.assistant_output
+end
+
+local function local_llm_parse_handler(chunk)
+  return chunk.message and chunk.message.content or ""
+end
+
+require("llm").setup({
+  url = "http://localhost:11434/api/chat", -- Ollama's endpoint
+  model = "mistral",-- Adjust based on your model
+  streaming_handler = local_llm_streaming_handler,
+  app_handler = {
+    WordTranslate = {
+      handler = tools.flexi_handler,
+      prompt = "Translate the following text to Chinese, please only return the translation",
+      opts = {
+        parse_handler = local_llm_parse_handler,
+        exit_on_move = true,
+        enter_flexible_window = false,
+      },
+    },
+  },
+})
+
+EOF
+noremap <silent> <F9> :LLMSessionToggle<CR>
+
+
+" Enable saving view settings like folds, cursor, window position, etc
+augroup remember_view
+  autocmd!
+  autocmd BufWinLeave * silent! mkview
+  autocmd BufWinEnter * silent! loadview
+augroup END
+
+
+
+
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  highlight = { enable = true },
+  indent = { enable = true },
+}
+EOF
+
+" Use expression-based folding
+set foldmethod=manual
+set foldexpr=nvim_treesitter#foldexpr()
+set foldlevelstart=99
+set foldenable
+
+

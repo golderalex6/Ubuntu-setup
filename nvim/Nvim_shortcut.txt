@@ -1,3 +1,9 @@
+
+#Code folding
+zf : fold selected code
+zo : unfold selected fold
+za : Toggle fold
+
 #Markdown preview
 :MarkdownPreview
 
@@ -65,6 +71,19 @@ select the text you want to indent/unindent
 <F4> : Close the current buffer
 <F5> : open file browser
 <F6> : open word searching
+
+#in file browser(F5)
+ -> in normal mode
+c : create new file
+r : rename file
+d : delete file
+m : move file
+<Tab> : select file
+How to move:
+1/select file with <Tab>
+2/move to you destination like normal
+3/press m
+
 
 
 <F7> : Run current openning Python,Js,Bash file
